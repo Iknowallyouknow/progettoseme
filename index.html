@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benvenuto | Sito Elegante</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #ec4899;
+            --glass: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #1e1b4b, #0c4a6e);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            background: linear-gradient(145deg, var(--glass), rgba(255,255,255,0.05));
+            backdrop-filter: blur(12px);
+            padding: 4rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 90%;
+            text-align: center;
+            transform: translateY(0);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            font-weight: 800;
+        }
+
+        p {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin: 2rem auto;
+            max-width: 600px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1.25rem 2.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white !important;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .cta-button:hover::after {
+            opacity: 1;
+        }
+
+        .decorative-blobs div {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+        }
+
+        .blob-1 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            top: 20%;
+            left: 10%;
+            animation: move 20s linear infinite;
+        }
+
+        .blob-2 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            bottom: 10%;
+            right: 15%;
+            animation: move 25s linear infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes move {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(100px, 100px); }
+            50% { transform: translate(0, 200px); }
+            75% { transform: translate(-100px, 100px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 2rem;
+                width: 95%;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            p {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="decorative-blobs">
+        <div class="blob-1"></div>
+        <div class="blob-2"></div>
+    </div>
+    
+    <div class="hero">
+        <h1>Benvenuto nel Mio Sito ✨</h1>
+        <p>Dove creatività e innovazione si incontrano. Scopri un universo di contenuti curati e soluzioni su misura per te.</p>
+        <a href="#explore" class="cta-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+            </svg>
+            Esplora Ora
+        </a>
+    </div>
+</body>
+</html>
