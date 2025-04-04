@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benvenuto | Sito Elegante</title>
+    <title>Benvenuto | Sito con reCAPTCHA</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -96,76 +97,421 @@
             opacity: 1;
         }
 
-        .decorative-blobs div {
+        .qr-wrapper {
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        #qr-code {
+            padding: 20px;
+            background: rgb(255 255 255 / 15%);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .resolution-display {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.8);
+            background: rgba(0,0,0,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+        }
+
+        .cookie-banner.visible {
+            transform: translateY(0);
+        }
+
+        .cookie-text {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+            max-width: 800px;
+        }
+
+        .cookie-link {
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .cookie-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .cookie-button {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .cookie-button.accept {
+            background: var(--primary);
+            color: white;
+        }
+
+        .cookie-button.decline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .cookie-button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .cookie-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            z-index: 1001;
+            display: none;
+        }
+
+        .cookie-modal.visible {
+            display: block;
+        }
+
+        .modal-content {
+            position: relative;
+        }
+
+        .modal-close {
             position: absolute;
+            top: -1rem;
+            right: -1rem;
+            background: var(--accent);
+            border: none;
+            color: white;
+            width: 2rem;
+            height: 2rem;
             border-radius: 50%;
-            filter: blur(60px);
-            z-index: -1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .blob-1 {
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            top: 20%;
-            left: 10%;
-            animation: move 20s linear infinite;
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
         }
 
-        .blob-2 {
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
-            bottom: 10%;
-            right: 15%;
-            animation: move 25s linear infinite reverse;
+        .modal-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: none;
         }
 
-        @keyframes move {
-            0% { transform: translate(0, 0); }
-            25% { transform: translate(100px, 100px); }
-            50% { transform: translate(0, 200px); }
-            75% { transform: translate(-100px, 100px); }
-            100% { transform: translate(0, 0); }
+        .modal-overlay.visible {
+            display: block;
         }
 
-        @media (max-width: 768px) {
-            .hero {
-                padding: 2rem;
-                width: 95%;
-            }
-            
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            p {
-                font-size: 1.1rem;
-            }
+        /* Stili aggiuntivi per il reCAPTCHA integrato */
+        .recaptcha-container {
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            max-width: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .recaptcha-wrap {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .recaptcha-wrap:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .recaptcha-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 3px;
+            margin-right: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .recaptcha-checkbox.checked {
+            border-color: #34a853;
+            background: #34a853;
+        }
+
+        .recaptcha-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 16px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .recaptcha-text {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+
+        .recaptcha-footer {
+            margin-top: 1rem;
+            text-align: center;
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+        }
+
+        .disabled-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .disabled-overlay.hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="decorative-blobs">
-        <div class="blob-1"></div>
-        <div class="blob-2"></div>
+    <!-- Overlay di blocco -->
+    <div class="disabled-overlay" id="disabledOverlay">
+        Per interagire con il sito, devi prima verificare di non essere un robot.
     </div>
-    
+
     <div class="hero">
         <h1>Benvenuto nel Mio Sito ✨</h1>
         <p>Dove creatività e innovazione si incontrano. Scopri un universo di contenuti curati e soluzioni su misura per te.</p>
-        <a href="#explore" class="cta-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 12h14"/>
-                <path d="m12 5 7 7-7 7"/>
-            </svg>
-            Esplora Ora
-        </a>
+        
+        <!-- reCAPTCHA Integrato -->
+        <div class="recaptcha-container">
+            <div class="recaptcha-wrap" id="recaptchaWrap">
+                <div class="recaptcha-checkbox" id="recaptchaCheckbox"></div>
+                <div class="recaptcha-text">Non sono un robot</div>
+            </div>
+        </div>
+        <div class="recaptcha-footer">
+            Protezione privacy - Condizioni
+        </div>
+
+        <a href="#explore" class="cta-button" id="ctaButton">Esplora Ora</a>
+        <div class="qr-wrapper">
+            <div id="qr-code"></div>
+            <div class="resolution-display" id="resolution"></div>
+        </div>
     </div>
+
+    <!-- Cookie Banner -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-text">
+            Utilizziamo i cookie per migliorare la tua esperienza. <span class="cookie-link" id="showPolicy">Leggi la nostra policy sui cookie</span>.
+        </div>
+        <div class="cookie-buttons">
+            <button class="cookie-button accept" id="acceptCookies">Accetta</button>
+            <button class="cookie-button decline" id="declineCookies">Rifiuta</button>
+        </div>
+    </div>
+
+    <!-- Cookie Policy Modal -->
+    <div class="cookie-modal" id="cookieModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">×</button>
+            <h2 class="modal-title">Policy sui Cookie</h2>
+            <div class="modal-text">
+                <p>Questa policy spiega come utilizziamo i cookie e tecnologie simili sul nostro sito web.</p>
+                
+                <h3>Cosa sono i cookie?</h3>
+                <p>I cookie sono piccoli file di testo che vengono archiviati sul tuo dispositivo quando visiti un sito web.</p>
+                
+                <h3>Come utilizziamo i cookie?</h3>
+                <ul>
+                    <li>Cookie essenziali: necessari per il corretto funzionamento del sito</li>
+                    <li>Cookie di prestazione: per analizzare l'uso del sito</li>
+                    <li>Cookie funzionali: per ricordare le tue preferenze</li>
+                </ul>
+                
+                <h3>Gestione dei cookie</h3>
+                <p>Puoi gestire o disabilitare i cookie attraverso le impostazioni del tuo browser.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+    <script>
+        // Funzione per generare il QR code
+        function generateQR() {
+            const qrContainer = document.getElementById('qr-code');
+            qrContainer.innerHTML = '';
+            
+            const size = Math.min(window.innerWidth * 0.25, 300);
+            const resolution = `${window.innerWidth} x ${window.innerHeight}`;
+            
+            new QRCode(qrContainer, {
+                text: resolution,
+                width: size,
+                height: size,
+                colorDark: "#ffffff",
+                colorLight: "transparent",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('resolution').textContent = `Risoluzione: ${resolution}`;
+        }
+
+        // Funzione per gestire il ridimensionamento
+        function handleResize() {
+            generateQR();
+        }
+
+        // Funzione per gestire i cookie
+        function handleCookies() {
+            const cookieBanner = document.getElementById('cookieBanner');
+            const acceptButton = document.getElementById('acceptCookies');
+            const declineButton = document.getElementById('declineCookies');
+            const showPolicy = document.getElementById('showPolicy');
+            const cookieModal = document.getElementById('cookieModal');
+            const closeModal = document.getElementById('closeModal');
+            const modalOverlay = document.getElementById('modalOverlay');
+
+            // Mostra il banner dopo 1 secondo
+            setTimeout(() => {
+                cookieBanner.classList.add('visible');
+            }, 1000);
+
+            // Gestione accettazione cookie
+            acceptButton.addEventListener('click', () => {
+                localStorage.setItem('cookiesAccepted', 'true');
+                cookieBanner.classList.remove('visible');
+            });
+
+            // Gestione rifiuto cookie
+            declineButton.addEventListener('click', () => {
+                localStorage.setItem('cookiesAccepted', 'false');
+                cookieBanner.classList.remove('visible');
+            });
+
+            // Mostra la policy dei cookie
+            showPolicy.addEventListener('click', () => {
+                cookieModal.classList.add('visible');
+                modalOverlay.classList.add('visible');
+            });
+
+            // Chiudi la policy dei cookie
+            closeModal.addEventListener('click', () => {
+                cookieModal.classList.remove('visible');
+                modalOverlay.classList.remove('visible');
+            });
+
+            // Chiudi la policy cliccando sull'overlay
+            modalOverlay.addEventListener('click', () => {
+                cookieModal.classList.remove('visible');
+                modalOverlay.classList.remove('visible');
+            });
+
+            // Controlla se l'utente ha già accettato i cookie
+            if (localStorage.getItem('cookiesAccepted') !== null) {
+                cookieBanner.style.display = 'none';
+            }
+        }
+
+        // Funzione per gestire il reCAPTCHA integrato
+        function handleRecaptcha() {
+            const disabledOverlay = document.getElementById('disabledOverlay');
+            const recaptchaWrap = document.getElementById('recaptchaWrap');
+            const recaptchaCheckbox = document.getElementById('recaptchaCheckbox');
+            const ctaButton = document.getElementById('ctaButton');
+
+            // Gestione del click sulla checkbox
+            recaptchaWrap.addEventListener('click', () => {
+                if (!recaptchaCheckbox.classList.contains('checked')) {
+                    recaptchaCheckbox.classList.add('checked');
+                    disabledOverlay.classList.add('hidden');
+                    ctaButton.style.pointerEvents = 'auto';
+                    ctaButton.style.opacity = '1';
+                }
+            });
+
+            // Blocca l'interazione iniziale
+            ctaButton.style.pointerEvents = 'none';
+            ctaButton.style.opacity = '0.5';
+        }
+
+        // Inizializzazione
+        window.addEventListener('DOMContentLoaded', () => {
+            generateQR();
+            handleCookies();
+            handleRecaptcha();
+        });
+        window.addEventListener('resize', handleResize);
+    </script>
 </body>
 </html>
+::
